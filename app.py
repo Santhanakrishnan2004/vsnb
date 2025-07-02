@@ -3,8 +3,9 @@ import time
 import requests
 from bs4 import BeautifulSoup
 
-BOT_TOKEN = "7682639011:AAHRIEumPuLtLdL73wvUQ7nL78xpuwL6rk0"
-CHAT_ID = "915284943"
+import os
+BOT_TOKEN = os.environ["BOT_TOKEN"]
+CHAT_ID = os.environ["CHAT_ID"]
 CHECK_INTERVAL = 60  # in seconds
 
 def send_telegram_message(message):
