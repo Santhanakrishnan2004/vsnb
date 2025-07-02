@@ -1,8 +1,8 @@
+
 import time
 import requests
 from bs4 import BeautifulSoup
 
-# Replace these with your actual values
 BOT_TOKEN = "7682639011:AAHRIEumPuLtLdL73wvUQ7nL78xpuwL6rk0"
 CHAT_ID = "915284943"
 CHECK_INTERVAL = 60  # in seconds
@@ -15,9 +15,10 @@ def send_telegram_message(message):
         "parse_mode": "HTML"
     }
     try:
-        requests.post(url, data=payload, timeout=10)
+        response = requests.post(url, data=payload, timeout=10)
+        print("✅ Sent alert:", response.text)
     except Exception as e:
-        print("❌ Failed to send Telegram message:", e)
+        print("❌ Telegram error:", e)
 
 def get_slot_availability():
     try:
@@ -25,11 +26,9 @@ def get_slot_availability():
         headers = {"User-Agent": "Mozilla/5.0"}
         response = requests.get(url, headers=headers, timeout=10)
         soup = BeautifulSoup(response.text, "html.parser")
-
         table = soup.find("table")
         if not table:
             return None
-
         rows = table.find_all("tr")[1:]
         for row in rows:
             cols = row.find_all("td")
@@ -41,24 +40,21 @@ def get_slot_availability():
                     return int(slots)
         return None
     except Exception as e:
-        print("Error fetching data:", e)
+        print("❌ Scraping error:", e)
         return None
 
 def main():
-    print("🔍 Watching visa slot availability...")
+    print("🔍 Running visa slot checker...")
     while True:
         slots = get_slot_availability()
         if slots is not None:
             print(f"Checked: {slots} slots available.")
-            if slots > 0:  # For testing
-                message = f"✅ <b>Visa Slots Available!</b>\n\n<b>Location:</b> Chennai VAC\n<b>Slots:</b> {slots}\n\n🔗 Check: https://visaslots.info/details/15"
+            if slots > 0:
+                message = f"✅ <b>Visa Slots Available!</b>\n\n<b>Location:</b> Chennai VAC\n<b>Slots:</b> {slots}\n\n🔗 https://visaslots.info/details/15"
                 send_telegram_message(message)
-                time.sleep(60)  # wait 5 minutes before checking again
-            else:
-                time.sleep(CHECK_INTERVAL)
         else:
-            print("⚠️ Failed to fetch slot info.")
-            time.sleep(CHECK_INTERVAL)
+            print("⚠️ Could not fetch slot data.")
+        time.sleep(CHECK_INTERVAL)
 
 if __name__ == "__main__":
     main()
