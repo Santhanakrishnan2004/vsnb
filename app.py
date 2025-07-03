@@ -43,19 +43,43 @@ def get_slot_availability():
     except Exception as e:
         print("❌ Scraping error:", e)
         return None
-
 def main():
-    print("🔍 Running visa slot checker...")
+    print("🔍 Watching visa slot availability...")
+    last_known_slots = -1  # To prevent repeat notifications
+
     while True:
         slots = get_slot_availability()
         if slots is not None:
             print(f"Checked: {slots} slots available.")
-            if slots > 0:
-                message = f"✅ <b>Visa Slots Available!</b>\n\n<b>Location:</b> Chennai VAC\n<b>Slots:</b> {slots}\n\n🔗 https://visaslots.info/details/15"
-                send_telegram_message(message)
+
+            if slots > 0 and slots != last_known_slots:
+                message = f"🚨 <b>Visa Slots Available!</b>\n\n<b>Location:</b> Chennai VAC\n<b>Slots:</b> {slots}\n\n🔗 Check: https://visaslots.info/details/15"
+
+                # 🔁 Send alert 5 times (like alarm)
+                for i in range(5):
+                    send_telegram_message(f"{message} 🔔 Alert #{i+1}")
+                    time.sleep(3)  # wait 3 seconds between alerts
+
+                last_known_slots = slots
+                time.sleep(300)  # 5 minutes cooldown
+            else:
+                time.sleep(CHECK_INTERVAL)
         else:
-            print("⚠️ Could not fetch slot data.")
-        time.sleep(CHECK_INTERVAL)
+            print("⚠️ Failed to fetch slot info.")
+            time.sleep(CHECK_INTERVAL)
+
+# def main():
+#     print("🔍 Running visa slot checker...")
+#     while True:
+#         slots = get_slot_availability()
+#         if slots is not None:
+#             print(f"Checked: {slots} slots available.")
+#             if slots > 0:
+#                 message = f"✅ <b>Visa Slots Available!</b>\n\n<b>Location:</b> Chennai VAC\n<b>Slots:</b> {slots}\n\n🔗 https://visaslots.info/details/15"
+#                 send_telegram_message(message)
+#         else:
+#             print("⚠️ Could not fetch slot data.")
+#         time.sleep(CHECK_INTERVAL)
 
 if __name__ == "__main__":
     main()
