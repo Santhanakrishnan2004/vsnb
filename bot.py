@@ -46,7 +46,7 @@ def main():
         slots = get_slot_availability()
         if slots is not None:
             print(f"Checked: {slots} slots available.")
-            if slots > 0 and slots != last_known_slots:
+            if slots >= 0 and slots != last_known_slots:
                 message = f"🚨 <b>Visa Slots Available!</b>\n\n<b>Location:</b> Chennai VAC\n<b>Slots:</b> {slots}\n\n🔗 https://visaslots.info/details/15"
                 for i in range(5):
                     send_telegram_message(f"{message} 🔔 Alert #{i+1}")
