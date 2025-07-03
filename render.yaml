@@ -1,7 +1,12 @@
 services:
-  - type: worker
-    name: visa-slot-checker
+  - type: web
+    name: visa-slot-checker-web
     env: python
-    plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: python main.py
+    startCommand: python app.py
+
+  - type: worker
+    name: visa-slot-checker-bot
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
